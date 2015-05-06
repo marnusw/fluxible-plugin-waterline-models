@@ -1,0 +1,30 @@
+{
+  "name": "fluxible-plugin-waterline-models",
+  "version": "0.1.0",
+  "description": "A plugin for Fluxible applications to use Waterline on the client and server isomorphically",
+  "main": "lib/plugin.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marnusw/fluxible-plugin-waterline-models.git"
+  },
+  "scripts": {},
+  "dependencies": {
+    "lodash": "^3.6.0",
+    "waterline": "marnusw/waterline#specifyValidatedValues"
+  },
+  "devDependencies": {},
+  "author": "Marnus Weststrate <marnusw@gmail.com>",
+  "contributors": [],
+  "keywords": [
+    "isomorphic",
+    "flux",
+    "fluxible",
+    "waterline",
+    "orm"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/marnusw/fluxible-plugin-waterline-models/issues"
+  },
+  "homepage": "https://github.com/marnusw/fluxible-plugin-waterline-models"
+}
