@@ -7,13 +7,18 @@
     "type": "git",
     "url": "https://github.com/marnusw/fluxible-plugin-waterline-models.git"
   },
-  "scripts": {},
+  "scripts": {
+    "test": "./node_modules/.bin/_mocha --recursive --timeout 4000"
+  },
   "dependencies": {
     "es6-promise": "^2.3.0",
     "lodash": "^3.6.0",
     "waterline": "^0.10.23"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "^2.2.5",
+    "sails-memory": "^0.10.4"
+  },
   "author": "Marnus Weststrate <marnusw@gmail.com>",
   "contributors": [],
   "keywords": [
