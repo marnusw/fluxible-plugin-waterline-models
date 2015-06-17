@@ -1,6 +1,7 @@
 module.exports = {
 
   identity: 'user',
+  globalId: 'User',
 
   connection: 'inMemoryDb',
 

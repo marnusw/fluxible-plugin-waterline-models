@@ -4,6 +4,9 @@ var WaterlineModelsPlugin = require('../lib/plugin');
 var User = require('./fixtures/User');
 var Car = require('./fixtures/Car');
 
+var connections = {inMemoryDb: {adapter: 'sails-memory'}};
+var adapters = {'sails-memory': require('sails-memory')};
+
 
 describe('fluxible-plugin-waterline-models', function() {
 
@@ -11,14 +14,10 @@ describe('fluxible-plugin-waterline-models', function() {
   // TEST SETUP
   ////////////////////////////////////////////////////
 
-  var connections;
-  var adapters;
   var plugin;
 
   beforeEach(function(done) {
     plugin = null;
-    connections = {inMemoryDb: {adapter: 'sails-memory'}};
-    adapters = {'sails-memory': require('sails-memory')};
     done();
   });
 
@@ -31,15 +30,12 @@ describe('fluxible-plugin-waterline-models', function() {
   // TEST METHODS
   ////////////////////////////////////////////////////
 
-  it('should merge server and client configuration with the common options', function(done) {
-    // TODO
-    done();
-  });
-
   it('should initialize the ORM and respond with a promise resolving to the models', function(done) {
     plugin = new WaterlineModelsPlugin({
       common: {
-        models: [User, Car],
+        models: [User, Car]
+      },
+      server: {
         connections: connections
       }
     });
@@ -68,8 +64,9 @@ describe('fluxible-plugin-waterline-models', function() {
       })
       .initialize(adapters, function(err, models) {
         if (err) {
-          done(err);
+          return done(err);
         }
+
         assert(models, 'Respond with models');
         assert(models.user, 'Created the User model');
 
@@ -80,7 +77,7 @@ describe('fluxible-plugin-waterline-models', function() {
         plug.plugActionContext(actionContext);
         plug.plugStoreContext(storeContext);
 
-        assert.deepEqual(actionContext.models, models, 'Models are available on the action context');
+        assert.equal(actionContext.models, models, 'Models are available on the action context');
 
         var UserConstructor = storeContext.getModelConstructor('user');
         assert(typeof UserConstructor == 'function', 'Model constructors can be retrieved');
@@ -119,13 +116,88 @@ describe('fluxible-plugin-waterline-models', function() {
   });
 
   it('should dehydrate the client options and initialize with client adapters on rehydration', function(done) {
-    // TODO
-    done();
+    plugin = new WaterlineModelsPlugin(adapters);
+    plugin.configure({
+      common: {
+        models: [User, Car]
+      },
+      client: {
+        connections: connections
+      },
+      server: {
+        connections: {foo: {}} // Will break if used.
+      }
+    });
+
+    var state = plugin.dehydrate();
+
+    assert.equal(state.common.models.length, 2, 'Common config dehydrated');
+    assert.deepEqual(state.client.connections, connections, 'Client config dehydrated');
+    assert(!state.client.models, 'Unmerged client config');
+
+    plugin.rehydrate(state, function(err) {
+      if (err) {
+        return done(err);
+      }
+
+      var actionContext = {};
+      plugin.plugContext().plugActionContext(actionContext);
+
+      assert(actionContext.models.user, 'Models were initialized');
+      assert(actionContext.models.User, 'Models were initialized');
+      assert(actionContext.models.car, 'Models were initialized');
+
+      // If the above is successful common and client configs were merged properly.
+
+      done();
+    });
   });
 
   it('should allow client configuration before rehydration and manual initialization with adapters', function(done) {
-    // TODO
-    done();
+
+    plugin = new WaterlineModelsPlugin({
+      common: {
+        models: [User, Car]
+      },
+      client: {
+        connections: {inMemoryDb: {}} // Will break is used, client side config should overrule this.
+      }
+    });
+
+    var state = plugin.dehydrate();
+
+    // Now we're on the client...
+
+    plugin.configure({
+      client: {
+        connections: connections
+      },
+      server: {
+        connections: {foo: {}} // Will break if used.
+      }
+    });
+
+    plugin.rehydrate(state, function(err) {
+      if (err) {
+        return done(err);
+      }
+
+      plugin.initialize(adapters, function(err, models) {
+        if (err) {
+          return done(err);
+        }
+
+        assert(models, 'Initialized models');
+
+        var actionContext = {};
+        plugin.plugContext().plugActionContext(actionContext);
+
+        // If the user model is present common and client configs were merged properly.
+        assert(actionContext.models.user, 'Models were initialized');
+
+        done();
+      });
+    });
   });
 
 });
