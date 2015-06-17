@@ -123,4 +123,9 @@ describe('fluxible-plugin-waterline-models', function() {
     done();
   });
 
+  it('should allow client configuration before rehydration and manual initialization with adapters', function(done) {
+    // TODO
+    done();
+  });
+
 });
