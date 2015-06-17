@@ -24,6 +24,9 @@ Because the plugin will be used on the server and client configuration must be p
 The option to set models initialised externally is also provided which will simply expose these models 
 on the context, this will be the case when the plugin is used alongside Sails.js on the server.
 
+It is assumed that the three de facto standard isomorphic startup scripts `app.js`, `server.js` and 
+`client.js` are used.
+
 ### Configuration Options
 
 Options for configuring Waterline and registering models are shown below. Since the configuration may,
@@ -112,7 +115,7 @@ var adapters = [sailsMemory];
 app.getPlugin('WaterlineModelsPlugin')
   .configure(options)
   .initialize(adapters, (err, ormModels) => {
-    // ORM is initialized and ready for use.
+    // ORM is initialized and ready for use on the server.
   });
 ```
 
@@ -132,11 +135,27 @@ The `adapters` can be provided as an array or object.
 
 #### Client Side Initialization
 
-If a client configuration has been provided the ORM will be initialized automatically when the 
-Fluxible Context is rehydrated. Since the configuration is de/rehydrated with the plugin this
-means that should the config and client adapters (see below) be provided earlier the `client.js` 
-script needn't access this plugin at all.
+If a client configuration and **client adapters have been provided** the ORM will be initialized 
+automatically when the Fluxible Context is rehydrated (see below).
 
+If, however, client adapters have not been provided initialization can still be done in the 
+`client.js` script:
+  
+```javascript
+import sailsMemory from 'sails-memory';
+
+const modelsPlugin = app.getPlugin('WaterlineModelsPlugin');
+
+// Configure the plugin before rehydration
+modelsPlugin.configure({client: options});
+
+app.rehydrate(dehydratedState, (err, context) => {
+  modelsPlugin.initialize([sailsMemory])
+    then(models => {
+      // Continue rendering the app etc.
+    });
+});
+```
 
 #### Tear Down
 
@@ -179,7 +198,7 @@ app.plug(WaterlineModelsPlugin(options, clientAdapters));
 
 import someServerAdapter from 'some-server-adapter';
 
-app.getPlugin('WaterlineModelsPlugin').initialize({'some-server-adapter': someServerAdapter})
+app.getPlugin('WaterlineModelsPlugin').initialize([someServerAdapter])
   .then(ormModels => { ... });
 
 
