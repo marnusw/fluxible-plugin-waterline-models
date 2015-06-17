@@ -25,10 +25,13 @@ describe('fluxible-plugin-waterline-models', function() {
   ////////////////////////////////////////////////////
 
   it('should initialize the ORM and respond with a promise resolving to the models', function(done) {
-    plugin = new WaterlineModelsPlugin();
+    plugin = new WaterlineModelsPlugin({
+      common: {
+        models: [User, Car],
+        connections: connections
+      }
+    });
     plugin
-      .addModelDefs([User, Car])
-      .addConnections(connections)
       .initialize(adapters)
       .then(function(models) {
         assert(models, 'Respond with models');
@@ -45,8 +48,12 @@ describe('fluxible-plugin-waterline-models', function() {
   it('should respond via callback if one is provided and plug the action and store contexts', function(done) {
     plugin = new WaterlineModelsPlugin();
     plugin
-      .addModelDefs([User, Car])
-      .addConnections(connections)
+      .configure({
+        common: {
+          models: [User, Car],
+          connections: connections
+        }
+      })
       .initialize(adapters, function(err, models) {
         if (err) {
           done(err);

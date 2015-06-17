@@ -100,7 +100,7 @@ The `configure()` method returns the plugin instance to allow fluent chaining.
 ### Initialize/tearDown the ORM
 
 Before using the models on the action context the ORM must be initialized. Once initialized the 
-configuration may not be changed until the ORM has been torn down.
+configuration may not be changed anymore.
 
 #### Server Side Initialization
 
