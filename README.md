@@ -18,6 +18,10 @@ is that this version has models indexed according to the all lowercase `identity
 applicable, the `globalID` where capitalisation is maintained. This allows using 
 `actionContext.models.ModelName` which may be preferred over `modelname`.
 
+*If you are using this with Sails.js and aren't interested in all the details you can skip to 
+the [Use with Sails.js](#use-with-sailsjs) example at the end.*
+
+
 ## Usage
 
 Because the plugin will be used on the server and client configuration must be provided for both.
@@ -26,6 +30,7 @@ on the context, this will be the case when the plugin is used alongside Sails.js
 
 It is assumed that the three de facto standard isomorphic startup scripts `app.js`, `server.js` and 
 `client.js` are used.
+
 
 ### Configuration Options
 
@@ -46,9 +51,10 @@ var options = {
       modelIdentity: {
         identity: '',   // Required: The key that will be used to retrieve the model 
                         // from `actionContext.models`.
-        connection: '', // Required: The connection to use for persistence; must match one 
-                        // of the connections.
-        attributes: ''  // Required: An object specifying the prototype properties and methods.
+        connection: '', // Required: The connection to use for persistence; 
+                        // must match one of the connections.
+        attributes: ''  // Required: An object specifying the prototype 
+                        // properties and methods.
       }
     },
     connections: {
@@ -219,10 +225,16 @@ app.plug(WaterlineModelsPlugin(clientAdapters));
 ### Use with Sails.js
 
 When using the plugin with Sails.js the model definitions will already be loaded and the server ORM 
-initialized. In this case the initialized models can be set directly:
+initialized. In this case the initialized models can be set directly and only the client configuration
+needs to be provided. Importing the client adapters in the shared `app.js` script means it will be
+included in the client JS bundle.
 
 ```javascript
 // app.js
+
+import egSomeRestAdapter from 'sails-rest-adapter';
+
+const clientAdapters = [egSomeRestAdapter];
 
 // Initialize with client adapters here.
 app.plug(WaterlineModelsPlugin(clientAdapters));
@@ -230,10 +242,10 @@ app.plug(WaterlineModelsPlugin(clientAdapters));
 
 // server.js
 
-// Get the model definitions (you might do this once at start-up and reuse this)
+// Get the model definitions (you might do this once at start-up and reuse this).
 sails.modules.loadModels(function(err, models) {
 
-  // Update the model defs for the client as necessary here.
+  // Update the model defs for the client as necessary here (again this could be reused).
   // For example, change the connection properties:
   _.each(models, model => model.connection = 'egSomeRestConnection');
 
@@ -242,7 +254,9 @@ sails.modules.loadModels(function(err, models) {
       // No server config necessary since we're setting the models from sails
       client: {
         models: models,
-        connections: {egSomeRestConnection: sails.config.connections.egSomeRestConnection}
+        connections: {
+          egSomeRestConnection: sails.config.connections.egSomeRestConnection
+        }
       }
     })
     .setExternalModels(sails.models); // The plugin is now "initialized".
@@ -254,6 +268,25 @@ sails.modules.loadModels(function(err, models) {
 
 // Nothing to do here!
 ```
+
+#### waterline-sails.io.js adapter
+
+A client adapter that might be useful is [waterline-sails.io.js](https://github.com/marnusw/waterline-sails.io.js)
+which allows Waterline to communicate with the server using the 
+[sails.io.js](http://sailsjs.org/#!/documentation/reference/websockets/sails.io.js) web-socket client.
+
+
+## Tests
+
+```
+npm install
+npm test
+```
+
+
+## Contributing
+
+PRs are welcome. Please add tests for any changes.
 
 
 ## License
