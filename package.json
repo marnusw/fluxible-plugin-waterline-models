@@ -13,7 +13,7 @@
   "dependencies": {
     "es6-promise": "^2.3.0",
     "lodash": "^3.6.0",
-    "waterline": "^0.10.23"
+    "waterline": "^0.10.25"
   },
   "devDependencies": {
     "mocha": "^2.2.5",
