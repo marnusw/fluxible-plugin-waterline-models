@@ -1,6 +1,6 @@
 {
   "name": "fluxible-plugin-waterline-models",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A plugin for Fluxible applications to use Waterline on the client and server isomorphically",
   "main": "lib/plugin.js",
   "repository": {
